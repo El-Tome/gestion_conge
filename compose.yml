@@ -1,0 +1,54 @@
+services:
+  db:
+    image: mariadb:11.6
+    container_name: symfony_db_gestion_conger
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: symfony_php_gestion_conger
+    volumes:
+      - ./app:/var/www/app
+    environment:
+      - APP_ENV=${APP_ENV}
+      - APP_SECRET=${APP_SECRET}
+      - DATABASE_URL=${DATABASE_URL}
+      - MESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN}
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: symfony_nginx_gestion_conger
+    ports:
+      - '8080:80'
+    volumes:
+      - ./app:/var/www/app:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+
+  phpmyadmin:
+    container_name: phpmyadmin_gestion_conger
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8082:80"
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+      - UPLOAD_LIMIT=128M
+
+volumes:
+  db:

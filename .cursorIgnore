@@ -1,0 +1,5 @@
+.idea
+.vscode
+app/vendor
+app/node_modules
+app/public/uploads
