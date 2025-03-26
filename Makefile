@@ -9,7 +9,7 @@ bash:
 
 build:
 	docker compose up -d --build && \
-	docker exec symfony_php_gestion_conger composer install && \
+	docker exec symfony_php_gestion_conger composer install
 
 cc:
 	docker exec symfony_php_gestion_conger php bin/console cache:clear
