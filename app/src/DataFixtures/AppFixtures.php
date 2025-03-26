@@ -23,6 +23,7 @@ class AppFixtures extends Fixture
                 'prenom' => $faker->firstName('fr_FR'),
                 'email' => $faker->unique()->safeEmail,
                 'password' => password_hash('password', PASSWORD_BCRYPT),
+                'roles' => rand(0,10) != 0 ? ['ROLE_USER'] : ['ROLE_USER', 'ROLE_ADMIN'] // Role par défaut
             ];
         });
 
