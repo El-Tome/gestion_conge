@@ -21,7 +21,7 @@ class CongeController extends AbstractController
         $this->congeRepository = $congeRepository;
     }
 
-    #[Route('/congeOld', name: 'conge')]
+    #[Route('/conge/admin', name: 'conge_list')]
     public function index(): Response
     {
         // Utiliser la méthode findAll() pour récupérer tous les congés
@@ -104,6 +104,20 @@ class CongeController extends AbstractController
         return $this->redirectToRoute('conge');
     }
     
-    
+    #[Route('/conge/{id}/accept', name: 'conge_accept')]
+    public function accept(Conge $conge, EntityManagerInterface $entityManager): Response
+    {
+        $conge->setStatut('accepté');
+        $entityManager->flush();
+        return $this->redirectToRoute('conge_list');
+    }
+
+    #[Route('/conge/{id}/refuse', name: 'conge_refuse')]
+    public function refuse(Conge $conge, EntityManagerInterface $entityManager): Response
+    {
+        $conge->setStatut('refusé');
+        $entityManager->flush();
+        return $this->redirectToRoute('conge_list');
+    }
    
 }

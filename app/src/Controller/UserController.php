@@ -3,6 +3,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +31,13 @@ class UserController extends AbstractController
           //  'controller_name' => 'UserController',
            'users' => $users,
         ]);
+    }
+
+    #[Route('/user/{id}/delete', name: 'user_delete')]
+    public function delete(User $user): Response
+    {
+        $this->userRepository->remove($user);
+        return $this->redirectToRoute('user');
     }
 }
 

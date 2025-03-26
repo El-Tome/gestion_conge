@@ -24,4 +24,10 @@ security:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/conge/admin, roles: ROLE_ADMIN }
+        - { path: ^/conge/accept, roles: ROLE_ADMIN }
+        - { path: ^/conge/refuse, roles: ROLE_ADMIN }
+        - { path: ^/admin_dashboard, roles: ROLE_ADMIN }
+        - { path: ^/user, roles: ROLE_ADMIN }
+        - { path: "^/user/{id}/delete", roles: ROLE_ADMIN }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

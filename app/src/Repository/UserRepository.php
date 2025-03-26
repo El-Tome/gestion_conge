@@ -21,6 +21,22 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    public function remove(User $user): void
+    {
+        // First get the entity manager
+        $em = $this->getEntityManager();
+        
+        // Find all related conge records and remove them first
+        $conges = $em->getRepository('App\Entity\Conge')->findBy(['user' => $user]);
+        foreach ($conges as $conge) {
+            $em->remove($conge);
+        }
+        
+        // Now remove the user
+        $em->remove($user);
+        $em->flush();
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body %}
+    <h1>Dashboard</h1>
+    <p>Bienvenue sur le dashboard admin</p>
+
+    <a href="{{ path('user') }}" class="btn btn-primary">Liste des utilisateurs</a>
+    <a href="{{ path('conge_list') }}" class="btn btn-primary">Liste des congés</a>
+    <a href="{{ path('app_stats') }}" class="btn btn-primary">Statistique</a>
+    <a href="{{ path('app_stats_user') }}" class="btn btn-primary">Statistique par utilisateur</a>
+
+{% endblock %}

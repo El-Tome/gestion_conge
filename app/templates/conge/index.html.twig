@@ -17,6 +17,10 @@
                             <strong>Date de début:</strong> {{ conge.dateDebut|date('d/m/Y') }}<br>
                             <strong>Date de fin:</strong> {{ conge.dateFin|date('d/m/Y') }}<br>
                             <strong>Statut:</strong> {{ conge.statut }}
+                            {% if conge.statut == 'en attente' %}
+                                <a href="{{ path('conge_accept', {'id': conge.id}) }}" class="btn btn-success">Accepter</a>
+                                <a href="{{ path('conge_refuse', {'id': conge.id}) }}" class="btn btn-danger">Refuser</a>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
