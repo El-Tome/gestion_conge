@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Conge{% endblock %}
+
+{% block body %}
+    <div class="alert alert-info">
+        {% for type, nb in nbConge %}
+            <p>Nombre de congés {{ type }} : {{ nb }}</p>
+        {% endfor %}
+    </div>
+
+    <a href="{{ path('conge_new') }}" class="btn btn-primary">Ajouter un congé</a>
+
+    <h1>Liste de mes congés</h1>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Date de début</th>
+                    <th>Date de fin</th>
+                    <th>Type</th>
+                    <th>Statut</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conge in conges %}
+                    <tr>
+                        <td>{{ conge.dateDebut|date('d/m/Y') }}</td>
+                        <td>{{ conge.dateFin|date('d/m/Y') }}</td>
+                        <td>{{ conge.type }}</td>
+                        <td>{{ conge.statut }}</td>
+                        <td>
+                            <a href="{{ path('conge_edit', {'id': conge.id}) }}" class="btn btn-primary">Modifier</a>
+                            <a href="{{ path('conge_delete', {'id': conge.id}) }}" class="btn btn-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

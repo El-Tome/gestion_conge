@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier un congé{% endblock %}
+
+{% block body %}
+    <h1>Modifier un congé</h1>
+    {{ form(congeForm) }}
+    <a href="{{ path('conge_show') }}" class="btn btn-secondary">Retour</a>
+    
+{% endblock %}

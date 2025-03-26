@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Demande de congé{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Demande de congé</h1>
+
+    {{ form_errors(congeForm) }}
+
+    {{ form_start(congeForm) }}
+        {{ form_row(congeForm.dateDebut) }}
+        {{ form_row(congeForm.dateFin) }}
+        {{ form_row(congeForm.type) }}
+        
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+    {{ form_end(congeForm) }}
+
+
+</div>
+{% endblock %}
