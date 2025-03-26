@@ -31,8 +31,12 @@
                         <td>{{ conge.type }}</td>
                         <td>{{ conge.statut }}</td>
                         <td>
-                            <a href="{{ path('conge_edit', {'id': conge.id}) }}" class="btn btn-primary">Modifier</a>
-                            <a href="{{ path('conge_delete', {'id': conge.id}) }}" class="btn btn-danger">Supprimer</a>
+                            {% if conge.dateDebut|date('d-m-Y') > "now"|date('d-m-Y') %}
+                                <a href="{{ path('conge_edit', {'id': conge.id}) }}" class="btn btn-primary">Modifier</a>
+                                <a href="{{ path('conge_delete', {'id': conge.id}) }}" class="btn btn-danger">Supprimer</a>
+                            {% else %}
+                                <span class="text-muted">Non modifiable</span>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

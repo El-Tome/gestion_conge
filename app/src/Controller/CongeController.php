@@ -81,13 +81,20 @@ class CongeController extends AbstractController
     #[Route('/conge/{id}/edit', name: 'conge_edit')]
     public function edit(Request $request, Conge $conge, EntityManagerInterface $entityManager): Response
     {
+        // Vérifier si le congé commence aujourd'hui ou est déjà passé
+        $today = new \DateTime('today');
+        if ($conge->getDateDebut() <= $today) {
+            $this->addFlash('error', 'Vous ne pouvez pas modifier un congé qui commence aujourd\'hui ou qui est déjà passé.');
+            return $this->redirectToRoute('conge_show');
+        }
+        
         $form = $this->createForm(CongeType::class, $conge);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('conge');
+            return $this->redirectToRoute('conge_show');
         }
 
         return $this->render('conge/edit.html.twig', [
@@ -98,10 +105,17 @@ class CongeController extends AbstractController
     #[Route('/conge/{id}/delete', name: 'conge_delete')]
     public function delete(Conge $conge, EntityManagerInterface $entityManager): Response
     {
+        // Vérifier si le congé commence aujourd'hui ou est déjà passé
+        $today = new \DateTime('today');
+        if ($conge->getDateDebut() <= $today) {
+            $this->addFlash('error', 'Vous ne pouvez pas supprimer un congé qui commence aujourd\'hui ou qui est déjà passé.');
+            return $this->redirectToRoute('conge_show');
+        }
+        
         $entityManager->remove($conge);
         $entityManager->flush();
 
-        return $this->redirectToRoute('conge');
+        return $this->redirectToRoute('conge_show');
     }
     
     #[Route('/conge/{id}/accept', name: 'conge_accept')]
