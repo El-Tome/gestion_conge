@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Seuil d'alerte{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Configuration du seuil d'alerte</h1>
+        <h3>Service : {{ serviceName }}</h3>
+        
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
+        <div class="my-4">
+            {{ form(form) }}
+        </div>
+        
+        {% if allServices|length > 0 %}
+        <div class="my-4">
+            <h4>Services configurés</h4>
+            <ul class="list-group">
+                {% for service in allServices %}
+                <li class="list-group-item">
+                    <a href="{{ path('app_seuil_alert', {'service': service.nomService}) }}">
+                        {{ service.nomService }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

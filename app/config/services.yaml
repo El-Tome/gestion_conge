@@ -20,5 +20,9 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    # Ajouter une exception pour l'entité Services
+    App\Entity\Services:
+        autowire: true
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

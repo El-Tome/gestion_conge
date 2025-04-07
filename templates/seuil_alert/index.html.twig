@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Seuil d'alerte{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Configuration du seuil d'alerte</h1>
+        
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+        
+        <div class="my-4">
+            {{ form(form) }}
+        </div>
+    </div>
+{% endblock %} 

@@ -6,6 +6,7 @@ use Doctrine\Persistence\ObjectManager;
 use App\Factory\CongeFactory;
 use App\Factory\UserFactory;
 use Faker\Factory;
+use App\Entity\Services;
 
 
 class AppFixtures extends Fixture
@@ -15,15 +16,26 @@ class AppFixtures extends Fixture
      */
     public function load(ObjectManager $manager): void
     {
+        // Créer d'abord des services
+        $servicesEntities = [];
+        for ($i = 1; $i <= 2; $i++) {
+            $service = new Services();
+            $service->setNom('Service ' . $i);
+            $manager->persist($service);
+            $servicesEntities[] = $service;
+        }
+        $manager->flush();
+
         // Crée des utilisateurs fictifs
-        $users = UserFactory::new()->createMany(10, function () {
+        $users = UserFactory::new()->createMany(10, function () use ($servicesEntities) {
             $faker = Factory::create();
             return [
                 'nom' => $faker->lastName('fr_FR'),
                 'prenom' => $faker->firstName('fr_FR'),
                 'email' => $faker->unique()->safeEmail,
                 'password' => password_hash('password', PASSWORD_BCRYPT),
-                'roles' => rand(0,10) != 0 ? ['ROLE_USER'] : ['ROLE_USER', 'ROLE_ADMIN'] // Role par défaut
+                'roles' => rand(0,10) != 0 ? ['ROLE_USER'] : ['ROLE_USER', 'ROLE_ADMIN'], // Role par défaut
+                'services' => $servicesEntities[rand(0, 1)] // Utiliser services (au pluriel)
             ];
         });
 

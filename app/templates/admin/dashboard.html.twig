@@ -3,12 +3,211 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block body %}
-    <h1>Dashboard</h1>
-    <p>Bienvenue sur le dashboard admin</p>
+    <div class="container">
+        <h1>Dashboard</h1>
+        <p>Bienvenue sur le dashboard admin</p>
 
-    <a href="{{ path('user') }}" class="btn btn-primary">Liste des utilisateurs</a>
-    <a href="{{ path('conge_list') }}" class="btn btn-primary">Liste des congés</a>
-    <a href="{{ path('app_stats') }}" class="btn btn-primary">Statistique</a>
-    <a href="{{ path('app_stats_user') }}" class="btn btn-primary">Statistique par utilisateur</a>
+        {# Alerte globale #}
+        {% if congeStats.alertLevel is defined %}
+            {% set alertClass = 'alert-success' %}
+            {% set alertIcon = 'bi bi-check-circle' %}
+            {% set alertTitle = 'Situation normale' %}
+            {% set alertMessage = 'Aucun seuil critique n\'est dépassé.' %}
+            
+            {% if congeStats.alertLevel == 1 %}
+                {% set alertClass = 'alert-warning' %}
+                {% set alertIcon = 'bi bi-exclamation-triangle' %}
+                {% set alertTitle = 'Attention !' %}
+                {% set alertMessage = 'Le pourcentage d\'utilisateurs en congé se rapproche du seuil critique.' %}
+            {% elseif congeStats.alertLevel == 2 %}
+                {% set alertClass = 'alert-danger' %}
+                {% set alertIcon = 'bi bi-exclamation-circle' %}
+                {% set alertTitle = 'Alerte critique !' %}
+                {% set alertMessage = 'Le seuil critique de congés est dépassé !' %}
+            {% endif %}
+            
+            <div class="alert {{ alertClass }} d-flex align-items-center shadow-sm mb-4" role="alert">
+                <div class="d-flex">
+                    <i class="{{ alertIcon }} fs-4 me-2"></i>
+                    <div>
+                        <h4 class="alert-heading">{{ alertTitle }}</h4>
+                        <p class="mb-0">{{ alertMessage }}</p>
+                        {% if congeStats.alertLevel > 0 %}
+                            <hr>
+                            <p class="mb-0">
+                                Actuellement, <strong>{{ congeStats.pourcentage|number_format(1) }}%</strong> des utilisateurs sont en congé
+                                ({{ congeStats.usersEnConge }} sur {{ congeStats.totalUsers }})
+                                {% if congeStats.seuilCritique %}
+                                    {% if congeStats.alertLevel == 2 %}
+                                        , ce qui dépasse le seuil critique fixé à <strong>{{ congeStats.seuilCritique }}%</strong>.
+                                    {% else %}
+                                        . Le seuil critique est fixé à <strong>{{ congeStats.seuilCritique }}%</strong>.
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
+        {# Alertes par service #}
+        {% if serviceStats is defined and serviceStats|length > 0 %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">Alertes par service</h2>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for serviceName, stats in serviceStats %}
+                            {% if stats.alertLevel > 0 %}
+                                {% set statusClass = stats.alertLevel == 2 ? 'list-group-item-danger' : 'list-group-item-warning' %}
+                                {% set statusIcon = stats.alertLevel == 2 ? 'bi bi-exclamation-circle' : 'bi bi-exclamation-triangle' %}
+                                <div class="list-group-item {{ statusClass }} d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="{{ statusIcon }} me-2"></i>
+                                        <strong>{{ serviceName }}</strong>: 
+                                        {{ stats.pourcentage|number_format(1) }}% d'utilisateurs en congé
+                                        ({{ stats.usersEnConge }} sur {{ stats.totalUsers }})
+                                    </div>
+                                    <span class="badge bg-dark rounded-pill">
+                                        Seuil: {{ stats.seuilCritique }}%
+                                    </span>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="list-group-item text-success">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Aucune alerte en cours pour les services
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h2 class="h5 mb-0">Actions rapides</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ path('user') }}" class="btn btn-primary">
+                                <i class="bi bi-people me-1"></i> Liste des utilisateurs
+                            </a>
+                            <a href="{{ path('conge_list') }}" class="btn btn-primary">
+                                <i class="bi bi-calendar-check me-1"></i> Liste des congés
+                            </a>
+                            <a href="{{ path('app_stats') }}" class="btn btn-primary">
+                                <i class="bi bi-bar-chart me-1"></i> Statistiques
+                            </a>
+                            <a href="{{ path('app_stats_user') }}" class="btn btn-primary">
+                                <i class="bi bi-person-lines-fill me-1"></i> Statistiques par utilisateur
+                            </a>
+                            <a href="{{ path('app_seuil_alert') }}" class="btn btn-warning">
+                                <i class="bi bi-gear me-1"></i> Configurer seuil d'alerte
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if congeStats is defined %}
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h2 class="h5 mb-0">Résumé des congés</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-person-check me-2"></i> Utilisateurs en congé</span>
+                                <span class="badge bg-primary rounded-pill">{{ congeStats.usersEnConge }}</span>
+                            </li>
+                            {% if congeStats.pendingConges is defined %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-hourglass-split me-2"></i> Congés en attente</span>
+                                <span class="badge bg-info rounded-pill">{{ congeStats.pendingConges }}</span>
+                            </li>
+                            {% endif %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-people me-2"></i> Total des utilisateurs</span>
+                                <span class="badge bg-secondary rounded-pill">{{ congeStats.totalUsers }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-percent me-2"></i> Pourcentage en congé</span>
+                                {% set badgeClass = 'bg-success' %}
+                                {% if congeStats.alertLevel == 1 %}
+                                    {% set badgeClass = 'bg-warning' %}
+                                {% elseif congeStats.alertLevel == 2 %}
+                                    {% set badgeClass = 'bg-danger' %}
+                                {% endif %}
+                                <span class="badge {{ badgeClass }} rounded-pill">
+                                    {{ congeStats.pourcentage|number_format(1) }}%
+                                </span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-exclamation-triangle me-2"></i> Seuil critique</span>
+                                <span class="badge bg-dark rounded-pill">
+                                    {{ congeStats.seuilCritique ? congeStats.seuilCritique ~ '%' : 'Non défini' }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        {# Services récapitulatif #}
+        {% if serviceStats is defined and serviceStats|length > 0 %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <h2 class="h5 mb-0">État des congés par service</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Service</th>
+                                <th>En congé</th>
+                                <th>Total</th>
+                                <th>Pourcentage</th>
+                                <th>Seuil</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for serviceName, stats in serviceStats %}
+                                {% set statusClass = '' %}
+                                {% set statusText = 'Normal' %}
+                                {% set statusBadge = 'bg-success' %}
+                                
+                                {% if stats.alertLevel == 1 %}
+                                    {% set statusClass = 'table-warning' %}
+                                    {% set statusText = 'Attention' %}
+                                    {% set statusBadge = 'bg-warning text-dark' %}
+                                {% elseif stats.alertLevel == 2 %}
+                                    {% set statusClass = 'table-danger' %}
+                                    {% set statusText = 'Critique' %}
+                                    {% set statusBadge = 'bg-danger' %}
+                                {% endif %}
+                                
+                                <tr class="{{ statusClass }}">
+                                    <td>{{ serviceName }}</td>
+                                    <td>{{ stats.usersEnConge }}</td>
+                                    <td>{{ stats.totalUsers }}</td>
+                                    <td>{{ stats.pourcentage|number_format(1) }}%</td>
+                                    <td>{{ stats.seuilCritique ? stats.seuilCritique ~ '%' : 'Non défini' }}</td>
+                                    <td><span class="badge {{ statusBadge }}">{{ statusText }}</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
